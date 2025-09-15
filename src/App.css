@@ -6,8 +6,8 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  font-family: "Inter", sans-serif;
   overflow: hidden;
+  font-family: "Inter", sans-serif;
 }
 
 body::before {
@@ -18,9 +18,7 @@ body::before {
   width: 100vw;
   height: 100vh;
   z-index: -1;
-
   background-color: #ffffff;
-
   background-size: 40px 40px;
   background-image: linear-gradient(to right, #e0e0e0 1px, transparent 1px),
     linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
