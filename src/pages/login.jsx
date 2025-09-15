@@ -1,28 +1,20 @@
+import { Link } from "react-router-dom";
+
+
 function Login() {
   return (
     <div className="flex h-screen flex-col items-center justify-center">
-      <div className="h-[52vh] w-[45vh] overflow-hidden rounded-lg border bg-[#D3DAD9]/20 backdrop-blur-sm">
+      <div className="h-[52vh] w-[45vh] overflow-hidden border-2 bg-white">
         <form
           className="flex h-full flex-col items-center"
         >
           <div className="flex w-full justify-center pt-7 text-2xl font-semibold">
             LOGIN
           </div>
-          <label
-            htmlFor="username"
-            className="text-md mt-7 mb-2 self-start pl-6 font-medium"
-          >
-            Username
-          </label>
-          <input
-            id="username"
-            maxLength={20}
-            className="mb-5 h-11 w-[40vh] rounded-lg border border-black/40 bg-white pl-3 text-sm font-normal outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          ></input>
+        
           <label
             htmlFor="email"
-            className="text-md mb-2 self-start pl-6 font-medium"
+            className="text-md mb-2 mt-7 self-start pl-6 font-medium"
           >
             Email address
           </label>
@@ -31,7 +23,7 @@ function Login() {
             type="email"
             maxLength={30}
             placeholder="username@gmail.com"
-            className="mb-5 h-11 w-[40vh] rounded-lg border border-black/40 bg-white pl-3 text-sm font-normal outline-none focus:ring-2 focus:ring-blue-500"
+            className="mb-5 h-11 w-[40vh] border-2 bg-white pl-3 text-sm font-normal outline-none focus:ring-2 focus:ring-blue-500"
             required
           ></input>
           <label
@@ -44,29 +36,29 @@ function Login() {
             id="password"
             type="password"
             maxLength={30}
-            className="mb-9 h-11 w-[40vh] rounded-lg border border-black/40 bg-white pl-3 text-sm font-normal outline-none focus:ring-2 focus:ring-blue-500"
+            className="mb-9 h-11 w-[40vh] border-2 bg-white pl-3 text-sm font-normal outline-none focus:ring-2 focus:ring-blue-500"
             required
           ></input>
           <button
             value="Submit"
             type="submit"
-            className="text-md h-11 w-[40vh] cursor-pointer rounded-lg border border-black/40 bg-[#1877F2] font-normal text-white outline-none focus:ring-2 focus:ring-blue-500"
+            className="text-md h-11 w-[40vh] cursor-pointer bg-[#1877F2] font-medium text-white outline-none focus:ring-2 focus:ring-blue-500"
           >
-            Sign up
+            Login
           </button>
-        </form>
 
-        <div className="flex flex-col items-center justify-center">
-          <div className="h-[45vh] w-[45vh] overflow-hidden rounded-lg border bg-[#D3DAD9]/20 backdrop-blur-sm"></div>
-        </div>
+          <span className="border-t-2 w-[80%] mt-8 opacity-15">
+          </span>
+        </form>
+        
       </div>
       <div className="mt-7 flex flex-col items-center justify-center">
-        <div className="h-[10vh] w-[45vh] overflow-hidden rounded-lg border bg-[#D3DAD9]/20 backdrop-blur-sm">
+        <div className="h-[10vh] w-[45vh] overflow-hidden bg-white border-2">
           <p className="flex h-full items-center justify-center">
             Need account?&nbsp;
-            <a href="#" className="text-[#1877F2] hover:underline">
+            <Link to="/" className="text-[#1877F2] hover:underline">
               Register here
-            </a>
+            </Link>
           </p>
         </div>
       </div>

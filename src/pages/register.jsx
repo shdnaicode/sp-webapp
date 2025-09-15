@@ -1,7 +1,9 @@
+import { Link } from "react-router-dom";
+
 function Register() {
   return (
     <div className="flex h-screen flex-col items-center justify-center">
-      <div className="h-[52vh] w-[45vh] overflow-hidden rounded-lg border bg-[#D3DAD9]/20 backdrop-blur-sm">
+      <div className="h-[52vh] w-[45vh] overflow-hidden border-2 bg-white">
         <form
           className="flex h-full flex-col items-center"
         >
@@ -17,7 +19,7 @@ function Register() {
           <input
             id="username"
             maxLength={20}
-            className="mb-5 h-11 w-[40vh] rounded-lg border border-black/40 bg-white pl-3 text-sm font-normal outline-none focus:ring-2 focus:ring-blue-500"
+            className="mb-5 h-11 w-[40vh] border-2 bg-white pl-3 text-sm font-normal outline-none focus:ring-2 focus:ring-blue-500"
             required
           ></input>
           <label
@@ -31,10 +33,10 @@ function Register() {
             type="email"
             maxLength={30}
             placeholder="username@gmail.com"
-            className="mb-5 h-11 w-[40vh] rounded-lg border border-black/40 bg-white pl-3 text-sm font-normal outline-none focus:ring-2 focus:ring-blue-500"
+            className="mb-5 h-11 w-[40vh] border-2 bg-white pl-3 text-sm font-normal outline-none focus:ring-2 focus:ring-blue-500"
             required
           ></input>
-          <label
+          <label 
             htmlFor="password"
             className="text-md mb-2 self-start pl-6 font-medium"
           >
@@ -44,29 +46,25 @@ function Register() {
             id="password"
             type="password"
             maxLength={30}
-            className="mb-9 h-11 w-[40vh] rounded-lg border border-black/40 bg-white pl-3 text-sm font-normal outline-none focus:ring-2 focus:ring-blue-500"
+            className="mb-9 h-11 w-[40vh] border-2 bg-white pl-3 text-sm font-normal outline-none focus:ring-2 focus:ring-blue-500"
             required
           ></input>
           <button
             value="Submit"
             type="submit"
-            className="text-md h-11 w-[40vh] cursor-pointer rounded-lg border border-black/40 bg-[#1877F2] font-normal text-white outline-none focus:ring-2 focus:ring-blue-500"
+            className="text-md h-11 w-[40vh] cursor-pointer bg-[#1877F2] font-medium text-white outline-none focus:ring-2 focus:ring-blue-500"
           >
-            Sign up
+            Register
           </button>
         </form>
-
-        <div className="flex flex-col items-center justify-center">
-          <div className="h-[45vh] w-[45vh] overflow-hidden rounded-lg border bg-[#D3DAD9]/20 backdrop-blur-sm"></div>
-        </div>
       </div>
       <div className="mt-7 flex flex-col items-center justify-center">
-        <div className="h-[10vh] w-[45vh] overflow-hidden rounded-lg border bg-[#D3DAD9]/20 backdrop-blur-sm">
+        <div className="h-[10vh] w-[45vh] overflow-hidden border-2 bg-white">
           <p className="flex h-full items-center justify-center">
             Already registered?&nbsp;
-            <a href="#" className="text-[#1877F2] hover:underline">
+            <Link to="/login" className="text-[#1877F2] hover:underline">
               Login here
-            </a>
+            </Link>
           </p>
         </div>
       </div>
