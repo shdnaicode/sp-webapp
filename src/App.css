@@ -6,7 +6,6 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
   font-family: "Inter", sans-serif;
 }
 
@@ -18,8 +17,87 @@ body::before {
   width: 100vw;
   height: 100vh;
   z-index: -1;
-  background-color: #ffffff;
-  background-size: 40px 40px;
-  background-image: linear-gradient(to right, #e0e0e0 1px, transparent 1px),
-    linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
+  background-color: #fffef6;
+  background-size: 44px 44px;
+  background-image: linear-gradient(to right, rgba(0,0,0,0.08) 2px, transparent 2px),
+    linear-gradient(to bottom, rgba(0,0,0,0.08) 2px, transparent 2px);
+}
+
+/* Global spacing and layout tweaks */
+:root {
+  --page-h-padding: 1.25rem; /* ~px-5 */
+  --page-h-padding-md: 2rem; /* ~px-8 */
+  --page-section-gap: 2rem; /* ~mt-8 */
+}
+
+.app-container {
+  padding-left: var(--page-h-padding);
+  padding-right: var(--page-h-padding);
+}
+
+@media (min-width: 768px) {
+  .app-container {
+    padding-left: var(--page-h-padding-md);
+    padding-right: var(--page-h-padding-md);
+  }
+}
+
+.app-section {
+  margin-top: var(--page-section-gap);
+}
+
+/* Neo-brutalism helpers */
+.nb-card {
+  border: 2px solid #000 !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  box-shadow: 6px 6px 0 0 #000000 !important;
+}
+
+.nb-bar {
+  background: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+/* Top bar specific (Navbar) */
+nav.nb-bar {
+  border-bottom: 2px solid #000000 !important;
+  box-shadow: 0 6px 0 0 #000000 !important;
+}
+
+/* Bottom bar specific (Footer) */
+footer.nb-bar {
+  border-top: 2px solid #000000 !important;
+  box-shadow: 0 -6px 0 0 #000000 !important;
+}
+
+.nb-button {
+  border: 2px solid #000000 !important;
+  box-shadow: 4px 4px 0 0 #000000 !important;
+  transition: transform 80ms ease, box-shadow 80ms ease !important;
+}
+.nb-button:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 2px 2px 0 0 #000000 !important;
+}
+
+.nb-button-primary {
+  border: 2px solid #000000 !important;
+  background: #1877F2 !important;
+  color: #ffffff !important;
+  box-shadow: 4px 4px 0 0 #000000 !important;
+  transition: transform 80ms ease, box-shadow 80ms ease !important;
+}
+.nb-button-primary:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 2px 2px 0 0 #000000 !important;
+}
+
+/* Improve form element spacing */
+input[type="text"], input[type="email"], input[type="password"], textarea, select {
+  padding: 0.625rem 0.75rem; /* ~py-2.5 px-3 */
+}
+
+label {
+  margin-bottom: 0.25rem;
 }
