@@ -21,6 +21,60 @@ function truncate(str = "", max = 240) {
   return s.slice(0, Math.max(0, max - 1)) + "…";
 }
 
+// --- Safe extraction helpers for Gemini responses ---
+function hadBadFinishReason(candidate) {
+  const bad = new Set([
+    "SAFETY",
+    "RECITATION",
+    "PROHIBITED_CONTENT",
+    "OTHER",
+    "MALFORMED_FUNCTION_CALL",
+    "BLOCKLIST",
+  ]);
+  return !!candidate && bad.has(candidate.finishReason);
+}
+
+function getTextFromResponse(response) {
+  try {
+    if (typeof response?.text === "function") return response.text();
+  } catch {}
+  try {
+    const parts = response?.candidates?.[0]?.content?.parts || [];
+    return parts.map((p) => p?.text || "").join("");
+  } catch {}
+  return "";
+}
+
+function formatBlockErrorMessage(response) {
+  const reason = response?.promptFeedback?.blockReason || response?.candidates?.[0]?.finishReason;
+  const safety = response?.promptFeedback?.safetyRatings || [];
+  const details = Array.isArray(safety)
+    ? safety
+        .map((r) => `${r.category || ""}:${r.probability || ""}`)
+        .filter(Boolean)
+        .join(", ")
+    : "";
+  return `Blocked by model (${reason || "unknown"})${details ? ": " + details : ""}`;
+}
+
+function extractTextOrThrow(response) {
+  if (response?.candidates && response.candidates.length > 0) {
+    if (response.candidates.length > 1) {
+      console.warn(
+        `This response had ${response.candidates.length} candidates. Returning text from the first candidate only. Access response.candidates directly to use the other candidates.`
+      );
+    }
+    if (hadBadFinishReason(response.candidates[0])) {
+      throw new Error(`Text not available. ${formatBlockErrorMessage(response)}`);
+    }
+    return getTextFromResponse(response);
+  }
+  if (response?.promptFeedback) {
+    throw new Error(`Text not available. ${formatBlockErrorMessage(response)}`);
+  }
+  return "";
+}
+
 async function buildCourseContext(courseSlugs) {
   const query = { published: true };
   if (Array.isArray(courseSlugs) && courseSlugs.length > 0) {
@@ -93,23 +147,39 @@ router.post("/chat/stream", async (req, res) => {
 
     const sendTextStream = async (textStreamPromise) => {
       const stream = await textStreamPromise;
-      // The SDK exposes a stream with onmessage; simulate by iterating chunks if available
+      // The SDK exposes a stream with async iterable chunks
       let full = "";
       for await (const chunk of stream.stream || []) {
-        const piece = chunk?.text || chunk?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        let piece = "";
+        if (typeof chunk?.text === "function") {
+          try { piece = chunk.text() || ""; } catch {}
+        } else if (typeof chunk?.text === "string") {
+          piece = chunk.text;
+        }
+        if (!piece) {
+          piece = chunk?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        }
         if (piece) {
           full += piece;
           sendEvent("token", { text: piece });
         }
       }
-      // Some SDK versions provide a final aggregated response
-      if (typeof stream.response?.text === "function") {
-        const finalText = stream.response.text();
+      // Await the final aggregated response and reconcile
+      try {
+        const finalResp = await stream.response;
+        if ((finalResp?.candidates?.[0] && hadBadFinishReason(finalResp.candidates[0])) || finalResp?.promptFeedback) {
+          const msg = formatBlockErrorMessage(finalResp);
+          sendEvent("error", { message: msg });
+          return res.end();
+        }
+        const finalText = getTextFromResponse(finalResp);
         if (finalText && finalText !== full) {
           const delta = finalText.slice(full.length);
           if (delta) sendEvent("token", { text: delta });
           full = finalText;
         }
+      } catch (e) {
+        console.warn("Failed to read final stream.response:", e?.message || e);
       }
       sendEvent("done", { text: full });
       res.end();
@@ -174,13 +244,16 @@ router.post("/context/from-url", async (req, res) => {
 
     const genAI = getGenAI();
     const modelName = model || process.env.GEMINI_MODEL || "gemini-1.5-flash";
-    const systemInstruction = await composeSystemInstruction({
-      system: process.env.GEMINI_SYSTEM_PROMPT,
-    }, "context/from-url");
+    const systemInstruction = await composeSystemInstruction(
+      {
+        system: process.env.GEMINI_SYSTEM_PROMPT,
+      },
+      "context/from-url"
+    );
     const gemModel = genAI.getGenerativeModel({ model: modelName, systemInstruction });
     const prompt = `You are given content fetched from a user-provided URL. Summarize the key points concisely in plain English, avoiding special formatting. Include the source domain in parentheses at the end. Keep to 6-10 short bullet-like lines (no dashes, just sentences). Text to summarize: \n\n${clipped}`;
     const result = await gemModel.generateContent(prompt);
-    const summary = (result?.response?.text && result.response.text()) || "";
+    const summary = extractTextOrThrow(result?.response);
     return res.json({ summary, url });
   } catch (err) {
     console.error("/api/gemini/context/from-url error:", err?.stack || err);
@@ -232,18 +305,18 @@ router.post("/chat", async (req, res) => {
       const gemModel = genAI.getGenerativeModel({ model: modelName, systemInstruction });
       if (history.length === 0 || history[0]?.role === "model") {
         const result = await gemModel.generateContent(userMsg);
-        const text = result.response.text();
+        const text = extractTextOrThrow(result?.response);
         return res.json({ text });
       }
       try {
         const chat = await gemModel.startChat({ history });
         const result = await chat.sendMessage(userMsg);
-        const text = result.response.text();
+        const text = extractTextOrThrow(result?.response);
         return res.json({ text });
       } catch (innerErr) {
         console.error("Gemini chat/sendMessage failed; falling back to generateContent", innerErr);
         const result = await gemModel.generateContent(userMsg);
-        const text = result.response.text();
+        const text = extractTextOrThrow(result?.response);
         return res.json({ text });
       }
     }
@@ -252,7 +325,7 @@ router.post("/chat", async (req, res) => {
     if (!textPrompt) return res.status(400).json({ message: "Missing prompt" });
     const gemModel = genAI.getGenerativeModel({ model: modelName, systemInstruction });
     const result = await gemModel.generateContent(textPrompt);
-    const text = result.response.text();
+    const text = extractTextOrThrow(result?.response);
     return res.json({ text });
   } catch (err) {
     console.error("/api/gemini/chat error:", err?.stack || err);
@@ -293,8 +366,8 @@ router.post("/generate", async (req, res) => {
     }
     const genAI = getGenAI();
     const modelClient = genAI.getGenerativeModel({ model, systemInstruction });
-    const result = await modelClient.generateContent(prompt);
-    const text = result?.response?.text?.() || "";
+  const result = await modelClient.generateContent(prompt);
+  const text = extractTextOrThrow(result?.response);
     return res.json({ text });
   } catch (err) {
     console.error("/api/gemini/generate error", err);
