@@ -2,6 +2,7 @@
 
 Full‑stack learning platform built with React (Vite) and Express/MongoDB. It includes email/password auth, GitHub OAuth login, course/quiz content, a streaming AI chatbot (Gemini), comments, progress tracking, and a responsive UI.
 
+![Preivew](/public/preview.png)
 
 ## Features
 - React + Vite SPA with React Router
