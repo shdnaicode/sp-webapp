@@ -20,7 +20,8 @@ import rateLimit from "express-rate-limit";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5050;
+const PORT = Number(process.env.PORT) || 5050;
+const HOST = process.env.HOST || "0.0.0.0";
 const MongoURL = process.env.MONGO_URI;
 
 if (!MongoURL) {
@@ -78,6 +79,9 @@ app.use("/api", (req, res) => {
 mongoose.connect(MongoURL)
   .then(() => {
     console.log("MongoDB connected");
-    app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+    app.listen(PORT, HOST, () => {
+      const where = HOST === "0.0.0.0" ? `port ${PORT}` : `${HOST}:${PORT}`;
+      console.log(`Server listening on ${where}`);
+    });
   })
   .catch(err => console.log("MongoDB connection error:", err));
