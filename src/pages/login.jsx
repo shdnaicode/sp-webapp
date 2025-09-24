@@ -84,6 +84,18 @@ function Login() {
             </Link>
           </p>
         </div>
+        <div className="mt-4 w-[45vh] overflow-hidden nb-card">
+          <button
+            type="button"
+            onClick={() => {
+              const GITHUB_OAUTH_URL = import.meta.env.VITE_GITHUB_OAUTH_URL || "/api/oauth/github";
+              window.location.href = GITHUB_OAUTH_URL;
+            }}
+            className="w-full nb-button-primary px-4 py-3 text-white"
+          >
+            Continue with GitHub
+          </button>
+        </div>
       </div>
       <Modal
         open={!!errorMsg}

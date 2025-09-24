@@ -19,6 +19,7 @@ import Profile from "./pages/profile";
 import AdminQuizzes from "./pages/admin-quizzes";
 import AdminCourses from "./pages/admin-courses";
 import NotFound from "./pages/not-found";
+import OAuthSuccess from "./pages/oauth-success";
 import "./App.css";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
@@ -41,6 +42,7 @@ function App() {
         <Route>
           <Route path="/register" element={<PublicOnly element={<Register />} />} />
           <Route path="/login" element={<PublicOnly element={<Login />} />} />
+          <Route path="/oauth/success" element={<PublicOnly element={<OAuthSuccess />} />} />
           <Route path="/browse" element={<Protected element={<Browse />} />} />
           <Route path="/courses/intro-to-robotics" element={<Protected element={<IntroRobotics />} />} />
           <Route path="/courses/arduino-basics" element={<Protected element={<ArduinoBasics />} />} />

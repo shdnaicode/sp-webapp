@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import authRoute from "./routes/auth.js";
+import oauthRoute from "./routes/oauth.js";
 import progressRoute from "./routes/progress.js";
 import geminiRoute from "./routes/gemini.js";
 import userRoute from "./routes/user.js";
@@ -70,6 +71,7 @@ app.use("/api/courses", coursesRoute);
 app.use("/api/chat", chatRoute);
 app.use("/api/chat", chatThreadsRoute);
 app.use("/api/comments", commentsRoute);
+app.use("/api/oauth", oauthRoute);
 
 // 404 handler for unknown API routes
 app.use("/api", (req, res) => {
